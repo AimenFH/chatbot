@@ -16,7 +16,6 @@ async def chat(user_input: Annotated[str, Form()]):
         temperature=0.6
     )
 
-
     bot_response = response.choices[0].message.content
     chat_log.append({'role': 'assistant', 'content': bot_response})
     return bot_response
