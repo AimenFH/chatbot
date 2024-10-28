@@ -1,9 +1,8 @@
-from openai import OpenAI
 from fastapi import FastAPI, Form
 from typing import Annotated
+from secret import openai_secret
 
-
-openai = OpenAI(api_key='sk-54YzuGKKeUx4sgt50MpsA_FxPkGE0NJslg2ZS8GCF-T3BlbkFJ35Z35ntUZcDJSNTsDGH_x8fhIaVaTpCUr8Jcn5-AwA')
+openai = openai_secret
 app = FastAPI()
 chat_log = [{'role': 'system', 'content': 'You are Python Tutor.'}]
 
