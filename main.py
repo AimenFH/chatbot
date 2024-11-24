@@ -3,15 +3,13 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from fastapi import Request, Form
 from typing import Annotated
-import openai
 import os
 from dotenv import load_dotenv
+from openai import OpenAI
 
-# Load environment variables from .env file
 load_dotenv()
 
-# Set the API key for the openai client
-openai.api_key = os.getenv("OPENAI_API_SECRET_KEY")
+openai = OpenAI(api_key=os.getenv('OPENAI_API_SECRET_KEY'))
 
 app = FastAPI()
 
@@ -23,7 +21,8 @@ chat_responses = []
 async def chat_page(request: Request):
     return templates.TemplateResponse("home.html", {"request": request, "chat_responses": chat_responses})
 
-chat_log = [{'role': 'system', 'content': 'You are a tutor for a master\'s degree course in Deep Learning and Virtual Reality Wahlpflichtmodul MODUL. You help students ask questions and provide information.'}]
+chat_log = [{'role': 'system', 'content': 'you Professor'}]
+
 @app.websocket("/ws")
 async def chat(websocket: WebSocket):
     await websocket.accept()
