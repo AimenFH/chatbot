@@ -3,13 +3,15 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from fastapi import Request, Form
 from typing import Annotated
+import openai
 import os
 from dotenv import load_dotenv
-from openai import OpenAI
 
+# Load environment variables from .env file
 load_dotenv()
 
-openai = OpenAI(api_key=os.getenv('OPENAI_API_SECRET_KEY'))
+# Set the API key for the openai client
+openai.api_key = os.getenv("OPENAI_API_SECRET_KEY")
 
 app = FastAPI()
 
