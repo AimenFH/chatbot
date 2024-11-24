@@ -1,33 +1,33 @@
 {% include 'layout.html' %}
 
 <div class="container mt-5">
-  <h3>
-    Add input to chat with personal chatbot
-  </h3>
+    <h3>
+        Ask your Deep Learning and Virtual Reality professor
+    </h3>
 
-  <div>
-    <div class="card text-center mt-3">
-      <div class="card-header">
-        Chat History:
-      </div>
-      <div class="card-body chat-history" id="chatHistory">
-        <!-- auto populate here -->
-        {% for response in chat_responses %}
+    <div>
+        <div class="card text-center mt-3">
+            <div class="card-header">
+                Chat History:
+            </div>
+            <div class="card-body chat-history" id="chatHistory">
+                <!-- auto populate here -->
+                {% for response in chat_responses %}
 
-        <div class="{{ 'chat-message user-input' if loop.index0 is even else 'chat-message ai-response' }}">
-          {{ response }}
+                <div class="{{ 'chat-message user-input' if loop.index0 is even else 'chat-message ai-response' }}">
+                    {{ response }}
+                </div>
+                {% endfor %}
+            </div>
         </div>
-        {% endfor %}
-      </div>
     </div>
-  </div>
 
-  <div class="container" id="footer">
-    <div class="input-group mb-3">
-      <input class="form-control" placeholder="Add input here" id="userInput">
-      <button class="btn btn-outline-primary" type="button" id="sendButton">Send</button>
+    <div class="container" id="footer">
+        <div class="input-group mb-3">
+            <input class="form-control" placeholder="Add input here" id="userInput">
+            <button class="btn btn-outline-primary" type="button" id="sendButton">Send</button>
+        </div>
     </div>
-  </div>
 
 </div>
 
@@ -88,4 +88,6 @@
       lastUserMessageDiv = null; // Prepare for the next message
     }
   };
+
+
 </script>

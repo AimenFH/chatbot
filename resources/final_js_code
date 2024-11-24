@@ -1,10 +1,9 @@
 <script>
-
   var websocketString = '';
   if (window.location.hostname === '127.0.0.1') {
     websocketString = "ws://localhost:8000/ws";
   } else {
-    websocketString=`wss://${window.location.hostname}/ws`
+    websocketString = `wss://${window.location.hostname}/ws`;
   }
 
   var ws = new WebSocket(websocketString);
@@ -15,6 +14,10 @@
   var lastUserMessageDiv = null; // Keep track of the last user message div
   var isNewUserInput = true; // Flag to track when a new user input happens
 
+  ws.onopen = function(event) {
+    console.log("WebSocket connection opened.");
+  };
+
   ws.onmessage = function(event) {
     var message = event.data.trim(); // Trim whitespace from the message
 
@@ -24,7 +27,7 @@
       var noPrependSpaceChars = [',', '.', '!', '?', ';', ':', "'"];
 
       if (noPrependSpaceChars.includes(message.charAt(0))) {
-          shouldAddSpace = false;
+        shouldAddSpace = false;
       }
 
       lastUserMessageDiv.textContent += (shouldAddSpace ? " " : "") + message;
@@ -37,6 +40,14 @@
       lastUserMessageDiv = messageDiv; // Update the reference to the last message div
       isNewUserInput = false; // Reset the flag as the AI response starts
     }
+  };
+
+  ws.onclose = function(event) {
+    console.log("WebSocket connection closed.");
+  };
+
+  ws.onerror = function(error) {
+    console.error("WebSocket error:", error);
   };
 
   sendButton.onclick = function() {

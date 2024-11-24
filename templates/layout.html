@@ -10,34 +10,49 @@
         <title>Chatbot</title>
 
         <style>
+            body {
+                background-image: url('https://thumbs.dreamstime.com/b/white-robot-chat-bot-artificial-intelligence-generative-ai-274279879.jpg');
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+                color: black; /* Change text color to black */
+            }
+            .content-container {
+                background-color: rgba(255, 255, 255, 0.7); /* More opaque background for better readability */
+                padding: 20px;
+                border-radius: 5px;
+                color: black; /* Change text color to black */
+            }
             .chat-history {
-              text-align: left;
-              width: 100%;
-              display: flex;
-              flex-direction: column;
-              overflow-y: auto;
+                text-align: left;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                overflow-y: auto;
+                background-color: rgba(255, 255, 255, 0.5); /* Semi-transparent background for better readability */
+                padding: 10px;
+                border-radius: 5px;
             }
             .chat-message {
-              width: fit-content;
-              word-wrap: break-word;
+                width: fit-content;
+                word-wrap: break-word;
             }
-
             .chat-message.user-input {
-              background-color: #d0eaff; /* Light blue background */
-              text-align: left;
-              border-radius: 5px;
-              padding: 5px;
-              margin-bottom: 8px;
-          }
-
-          .chat-message.ai-response {
-              background-color: #f1f1f1; /* Light grey background */
-              text-align: left;
-              border-radius: 5px;
-              padding: 5px;
-              margin-bottom: 8px;
+                background-color: #d0eaff; /* Light blue background */
+                text-align: left;
+                border-radius: 5px;
+                padding: 5px;
+                margin-bottom: 8px;
+                color: black; /* Change text color to black */
             }
-
+            .chat-message.ai-response {
+                background-color: #f1f1f1; /* Light grey background */
+                text-align: left;
+                border-radius: 5px;
+                padding: 5px;
+                margin-bottom: 8px;
+                color: black; /* Change text color to black */
+            }
             #footer {
                 position: fixed;
                 bottom: 3%;
@@ -49,8 +64,10 @@
     <body>
         {% include 'navbar.html' %}
 
-        {% block content %}
-        {% endblock %}
+        <div class="content-container">
+            {% block content %}
+            {% endblock %}
+        </div>
 
         <!-- Option 1: Bootstrap Bundle with Popper -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
