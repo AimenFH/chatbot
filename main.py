@@ -6,6 +6,41 @@ from typing import Annotated
 import os
 from dotenv import load_dotenv
 import openai
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+import string
+from sentence_transformers import SentenceTransformer, util
+
+# Download necessary NLTK data files
+nltk.download('punkt')
+nltk.download('stopwords')
+
+# Load a pre-trained model for text similarity
+similarity_model = SentenceTransformer('all-MiniLM-L6-v2')
+
+def preprocess_text(text):
+    # Tokenization
+    tokens = word_tokenize(text)
+
+    # Cleaning: Remove special characters and unnecessary whitespace
+    tokens = [word for word in tokens if word.isalnum()]
+
+    # Normalization: Convert to lowercase
+    tokens = [word.lower() for word in tokens]
+
+    # Remove stopwords
+    stop_words = set(stopwords.words('english'))
+    tokens = [word for word in tokens if word not in stop_words]
+
+    return tokens
+
+def perceptual_quality_analysis(prompt, response):
+    # Measure the similarity between the prompt and the response
+    prompt_embedding = similarity_model.encode(prompt, convert_to_tensor=True)
+    response_embedding = similarity_model.encode(response, convert_to_tensor=True)
+    similarity_score = util.pytorch_cos_sim(prompt_embedding, response_embedding).item()
+    return similarity_score
 
 load_dotenv()
 
@@ -43,10 +78,14 @@ async def chat(websocket: WebSocket):
                 ai_response = ''
 
                 for chunk in response:
-                    if chunk.choices[0].delta and chunk.choices[0].delta.content:
+                    if chunk.choices[0].delta.content is not None:
                         ai_response += chunk.choices[0].delta.content
                         await websocket.send_text(chunk.choices[0].delta.content)
                 chat_responses.append(ai_response)
+
+                # Perform perceptual quality analysis
+                quality_score = perceptual_quality_analysis(user_input, ai_response)
+                print(f"Perceptual Quality Score: {quality_score}")
 
             except Exception as e:
                 await websocket.send_text(f'Error: {str(e)}')
@@ -69,6 +108,10 @@ async def chat(request: Request, user_input: Annotated[str, Form()]):
         bot_response = response.choices[0].message.content
         chat_log.append({'role': 'assistant', 'content': bot_response})
         chat_responses.append(bot_response)
+
+        # Perform perceptual quality analysis
+        quality_score = perceptual_quality_analysis(user_input, bot_response)
+        print(f"Perceptual Quality Score: {quality_score}")
 
     except Exception as e:
         bot_response = f'Error: {str(e)}'
