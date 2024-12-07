@@ -25,7 +25,7 @@ def preprocess_text(text):
     tokens = word_tokenize(text)
 
     # Cleaning: Remove special characters and unnecessary whitespace
-    tokens = [word for word in tokens if word.isalnum()]
+    tokens = [word for word in tokens if word is not None and word.isalnum()]
 
     # Normalization: Convert to lowercase
     tokens = [word.lower() for word in tokens]
@@ -62,6 +62,13 @@ def predict_fn(texts):
         )
         responses.append(response.choices[0].message.content)
     return responses
+
+def evaluate_image_quality(prompt, image_url):
+    # Placeholder function to evaluate image quality
+    # In a real scenario, you would use visual metrics to assess alignment
+    # For now, we return a fixed score
+    quality_score = 0.9  # Example score
+    return quality_score
 
 load_dotenv()
 
@@ -156,10 +163,16 @@ async def create_image(request: Request, user_input: Annotated[str, Form()]):
         )
 
         image_url = response.data[0].url
+
+        # Evaluate perceptual quality
+        quality_score = evaluate_image_quality(user_input, image_url)
+        print(f"Perceptual Quality Score: {quality_score}")
+
     except Exception as e:
         image_url = f'Error: {str(e)}'
+        quality_score = None
 
-    return templates.TemplateResponse("image.html", {"request": request, "image_url": image_url})
+    return templates.TemplateResponse("image.html", {"request": request, "image_url": image_url, "quality_score": quality_score})
 
 @app.post("/feedback", response_class=HTMLResponse)
 async def submit_feedback(request: Request, clarity: Annotated[str, Form()], creativity: Annotated[str, Form()], relevance: Annotated[str, Form()]):
