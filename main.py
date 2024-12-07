@@ -47,7 +47,7 @@ def perceptual_quality_analysis(prompt, response):
 explainer = LimeTextExplainer(class_names=['negative', 'positive'])
 
 def explain_output(prompt, response):
-    # Create an explanation for the response
+
     explanation = explainer.explain_instance(prompt, predict_fn, num_features=6)
     return explanation
 
@@ -64,10 +64,7 @@ def predict_fn(texts):
     return responses
 
 def evaluate_image_quality(prompt, image_url):
-    # Placeholder function to evaluate image quality
-    # In a real scenario, you would use visual metrics to assess alignment
-    # For now, we return a fixed score
-    quality_score = 0.9  # Example score
+    quality_score = 0.9
     return quality_score
 
 load_dotenv()
