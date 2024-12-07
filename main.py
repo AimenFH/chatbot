@@ -1,7 +1,7 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Form
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
-from fastapi import Request, Form
+from fastapi import Request
 from typing import Annotated
 import os
 from dotenv import load_dotenv
@@ -11,6 +11,7 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 import string
 from sentence_transformers import SentenceTransformer, util
+from lime.lime_text import LimeTextExplainer
 
 # Download necessary NLTK data files
 nltk.download('punkt')
@@ -41,6 +42,26 @@ def perceptual_quality_analysis(prompt, response):
     response_embedding = similarity_model.encode(response, convert_to_tensor=True)
     similarity_score = util.pytorch_cos_sim(prompt_embedding, response_embedding).item()
     return similarity_score
+
+# Initialize the LIME text explainer
+explainer = LimeTextExplainer(class_names=['negative', 'positive'])
+
+def explain_output(prompt, response):
+    # Create an explanation for the response
+    explanation = explainer.explain_instance(prompt, predict_fn, num_features=6)
+    return explanation
+
+def predict_fn(texts):
+    # Function to predict the output for LIME
+    responses = []
+    for text in texts:
+        response = openai.ChatCompletion.create(
+            model='gpt-4',
+            messages=[{'role': 'user', 'content': text}],
+            temperature=0.6
+        )
+        responses.append(response.choices[0].message.content)
+    return responses
 
 load_dotenv()
 
@@ -139,3 +160,33 @@ async def create_image(request: Request, user_input: Annotated[str, Form()]):
         image_url = f'Error: {str(e)}'
 
     return templates.TemplateResponse("image.html", {"request": request, "image_url": image_url})
+
+@app.post("/feedback", response_class=HTMLResponse)
+async def submit_feedback(request: Request, clarity: Annotated[str, Form()], creativity: Annotated[str, Form()], relevance: Annotated[str, Form()]):
+    feedback = {
+        "clarity": clarity,
+        "creativity": creativity,
+        "relevance": relevance
+    }
+    print(f"Feedback received: {feedback}")
+    return templates.TemplateResponse("image.html", {"request": request, "feedback": feedback})
+
+@app.post("/explain", response_class=HTMLResponse)
+async def explain(request: Request, user_input: Annotated[str, Form()]):
+    try:
+        response = openai.ChatCompletion.create(
+            model='gpt-4',
+            messages=[{'role': 'user', 'content': user_input}],
+            temperature=0.6
+        )
+        bot_response = response.choices[0].message.content
+
+        # Generate LIME explanation
+        explanation = explain_output(user_input, bot_response)
+        explanation_html = explanation.as_html()
+
+    except Exception as e:
+        bot_response = f'Error: {str(e)}'
+        explanation_html = ''
+
+    return templates.TemplateResponse("explain.html", {"request": request, "user_input": user_input, "bot_response": bot_response, "explanation_html": explanation_html})
